@@ -1,6 +1,8 @@
 ﻿
 using System;
 using System.Reflection;
+using VxFormGenerator.Core.Attributes;
+using VxFormGenerator.Core.Render;
 
 namespace VxFormGenerator.Core.Layout
 {
@@ -11,6 +13,22 @@ namespace VxFormGenerator.Core.Layout
         public string Name { get; private set; }
         public VxFormElementLayoutAttribute RenderOptions { get; set; }
         public object Model { get; private set; }
+        public bool HasLookup
+        {
+            get
+            {
+                return Model.GetType().GetProperty(Name).GetCustomAttribute<VxLookupAttribute>() != null;
+            }
+        }
+
+        public VxLookupResolverResult GetLookup
+        {
+            get
+            {
+                return Model.GetType().GetProperty(Name).GetCustomAttribute<VxLookupAttribute>().GetResolver();
+            }
+        }
+
 
         public VxFormElementDefinition(string fieldname, VxFormElementLayoutAttribute layoutAttr, object modelInstance)
         {

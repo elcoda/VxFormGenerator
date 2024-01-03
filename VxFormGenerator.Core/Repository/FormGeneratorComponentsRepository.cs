@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using VxFormGenerator.Core.Layout;
+using VxFormGenerator.Core.Repository.Registration;
 
 namespace VxFormGenerator.Core.Repository
 {
 
-    public class FormGeneratorComponentsRepository<TKey> : IFormGeneratorComponentsRepository
+    public class FormGeneratorComponentsRepository<TKey, TRegistrationAttribute> : IFormGeneratorComponentsRepository, IChangeFormGeneratorComponentsRepository<TKey> where TRegistrationAttribute : IVxComponentAttributeRegistration<TKey>
     {
-        protected Dictionary<TKey, Type> _ComponentDict = new Dictionary<TKey, Type>();
+        protected Dictionary<TKey, IList<IVxComponentRegistration<TKey>>> _ComponentDict = new Dictionary<TKey, IList<IVxComponentRegistration<TKey>>>();
 
         public Type _DefaultComponent { get; protected set; }
 
@@ -15,20 +19,28 @@ namespace VxFormGenerator.Core.Repository
 
         }
 
-        public FormGeneratorComponentsRepository(Dictionary<TKey, Type> componentRegistrations)
+        public FormGeneratorComponentsRepository(Dictionary<TKey, IList<IVxComponentRegistration<TKey>>> componentRegistrations)
         {
             _ComponentDict = componentRegistrations;
         }
-        public FormGeneratorComponentsRepository(Dictionary<TKey, Type> componentRegistrations, Type defaultComponent)
+        public FormGeneratorComponentsRepository(Dictionary<TKey, IList<IVxComponentRegistration<TKey>>> componentRegistrations, Type defaultComponent)
         {
             _ComponentDict = componentRegistrations;
             _DefaultComponent = defaultComponent;
         }
 
 
-        protected void RegisterComponent(TKey key, Type component)
+        protected void RegisterComponent(TKey key, IVxComponentRegistration<TKey> registration)
         {
-            _ComponentDict.Add(key, component);
+            if (_ComponentDict.ContainsKey(key))
+            {
+                var dataRegistration = _ComponentDict.GetValueOrDefault(key);
+                dataRegistration.Add(registration);
+            }
+            else
+                _ComponentDict.Add(key, new[] {
+                    registration
+             });
         }
 
         protected void RemoveComponent(TKey key)
@@ -36,11 +48,11 @@ namespace VxFormGenerator.Core.Repository
             _ComponentDict.Remove(key);
         }
 
-        protected virtual Type GetComponent(TKey key)
+        protected virtual Type GetComponent(TKey key, Layout.VxFormElementDefinition formColumnDefinition)
         {
-            var found = _ComponentDict.TryGetValue(key, out Type outVar);
+            var found = _ComponentDict.TryGetValue(key, out IList<IVxComponentRegistration<TKey>> outVar);
 
-            return found ? outVar : _DefaultComponent;
+            return found ? outVar.First().Component : _DefaultComponent;
         }
 
         public void Clear()
@@ -48,19 +60,37 @@ namespace VxFormGenerator.Core.Repository
             _ComponentDict.Clear();
         }
 
-        public void RegisterComponent(object key, Type component)
-        {
-            RegisterComponent((TKey) key, component);
-        }
-
         public void RemoveComponent(object key)
         {
-            RemoveComponent((TKey) key);
+            RemoveComponent((TKey)key);
         }
 
-        public Type GetComponent(object key)
+        public Type GetComponent(object key, Layout.VxFormElementDefinition formColumnDefinition)
         {
-            return GetComponent((TKey) key);
+            return GetComponent((TKey)key, formColumnDefinition);
+        }
+
+        protected int RegisterAllDiscoverableFormElements(Assembly[] assemblies, Func<TRegistrationAttribute, Type, IVxComponentRegistration<TKey>> converter)
+        {
+            var res = assemblies.AsParallel()
+                 .SelectMany(c => c.GetTypes())
+                 .Select(type => type.GetCustomAttributes(typeof(TRegistrationAttribute), true)
+                     .Cast<TRegistrationAttribute>().Select(item => converter(item, type))
+                     )
+                 .Where(c => c.Any());
+            var list = res.ToList();
+
+            foreach (var item in list)
+                foreach (var reg in item)
+                    this.RegisterComponent(reg.SupportedDataType, reg);
+
+
+            return list.Count;
+        }
+
+        public void RegisterComponent(object key, IVxComponentRegistration<TKey> registration)
+        {
+            RegisterComponent((TKey)key, registration);
         }
     }
 
