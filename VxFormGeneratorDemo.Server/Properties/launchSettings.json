@@ -21,8 +21,8 @@
       "commandLineArgs": "watch run",
       "workingDirectory": "$(ProjectDir)",
       "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/",
-      "applicationUrl": "http://localhost:5000/",
+      "launchUrl": "http://localhost:8080/",
+      "applicationUrl": "http://localhost:8080/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -30,7 +30,7 @@
     "FormGeneratorDemo": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5000",
+      "applicationUrl": "http://localhost:8080",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

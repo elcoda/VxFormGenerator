@@ -310,10 +310,10 @@ Set options at **Component** level, these options override the global one.
 
 Run the demo so you can see the options and effects interactively:
 
-1. `git clone https://github.com/Aaltuj/VxFormGenerator.git`
+1. `git clone https://github.com/el_coda/VxFormGenerator.git`
 2. `cd VxFormGenerator ` 
 3. `run.cmd` on Windows or `bash run.sh` on Linux/Mac
-4. navigate to `http://localhost:5000/definition-form`
+4. navigate to `http://localhost:8080/definition-form`
 
 
 
