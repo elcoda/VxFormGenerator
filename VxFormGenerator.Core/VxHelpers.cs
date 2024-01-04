@@ -29,6 +29,34 @@ namespace VxFormGenerator.Core
             }
         }
 
+        private static object GetPropValue(object src, string propName)
+        {
+            return src.GetType().GetProperty(propName).GetValue(src, null);
+        }
+
+        public static Dictionary<string, string> ListLookupConverter<T>(
+                List<T> typedList, 
+                string idPropertyName,
+                string descriptionPropertyName,
+                string orderByPropertyName = null)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            List<T> orderedList= typedList;
+            
+            //Catchup the order by clause
+            if (orderByPropertyName != null)
+                orderedList = typedList.OrderBy(s => s.GetType().GetProperty(orderByPropertyName).GetValue(s)).ToList();
+            
+            foreach (var item in orderedList)
+            {
+                var id = GetPropValue(item, idPropertyName)?.ToString();
+                var description = GetPropValue(item, descriptionPropertyName)?.ToString();
+                res.Add(id,description);
+            }
+
+            return res;
+        }
+
         internal static IEnumerable<PropertyInfo> GetModelProperties(Type modelType)
         {
             return modelType.GetProperties()

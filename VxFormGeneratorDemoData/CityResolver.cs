@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VxFormGenerator.Core.Render;
 using System.Linq;
+using VxFormGenerator.Core;
 
 namespace VxFormGeneratorDemoData
 {
@@ -35,12 +36,10 @@ namespace VxFormGeneratorDemoData
         private async Task<VxLookupResult<string>> DataRetriever(CancellationTokenSource source)
         {
             await Task.Delay(2000, source.Token);
-                        
-            var citiesKvp = Cities
-                .Select(x=> new KeyValuePair<string, string>(x.Id.ToString(), x.Name))
-                .ToList().ToDictionary(x => x.Key, x => x.Value);;
-            
-            var result = new VxLookupResult<string>() { Name = Name, Values = citiesKvp};
+
+            var CityValues = VxHelpers.ListLookupConverter(Cities,"Id","Name","Name");
+      
+            var result = new VxLookupResult<string>() { Name = Name, Values = CityValues};
 
             return result;
         }
