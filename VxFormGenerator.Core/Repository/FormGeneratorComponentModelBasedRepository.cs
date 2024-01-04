@@ -41,6 +41,8 @@ namespace VxFormGenerator.Core.Repository
                 type = Nullable.GetUnderlyingType(key);
             }
 
+            
+            //TODO: type non torna le classi di base dalle quali si eredita
             return base.GetComponent(type, formElementDefinition);
         }
 

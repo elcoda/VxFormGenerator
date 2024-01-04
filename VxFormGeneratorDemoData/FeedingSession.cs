@@ -22,7 +22,8 @@ namespace VxFormGeneratorDemoData
         public DateTime Start { get; set; }
         [Display(Name = "End")]
         public DateTime End { get; set; }
-        [Display(Name = "Throwing up")]
+        
+        [Display(Name = "Bool checkbox")]
         public bool ThrowingUp { get; set; }
 
         [Display(Name = "Throwing up dict")]

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +13,20 @@ namespace VxFormGeneratorDemoData
         public override Task<VxLookupResult<string>> GetLookupValues(object param)
         {
             CancellationTokenSource source = new CancellationTokenSource();
+            var taskResult = this.DataRetriever(source);
+            return taskResult;
 
-            return Task.Run(async delegate
-            {
-                await Task.Delay(2000, source.Token);
-                return new VxLookupResult<string>() { Name = Name, Values = new Dictionary<string, string>() { { "NL", "Netherlands" }, { "DE", "Germany" } } };
-            });
-
+        }
+        
+        private async Task<VxLookupResult<string>> DataRetriever(CancellationTokenSource source)
+        {
+            await Task.Delay(2000, source.Token);
+            var result = new VxLookupResult<string>() { Name = Name, Values = new Dictionary<string, string>()
+                {
+                    { "NL", "Netherlands" }, { "DE", "Germany" }, {"IT", "Italy"}, {"US", "United States"}
+                } 
+            };
+            return result;
         }
     }
 }

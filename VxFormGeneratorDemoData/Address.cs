@@ -27,11 +27,17 @@ namespace VxFormGeneratorDemoData
         // Add element to row 2 and set the width to 3 of 12 columns
         [VxFormElementLayout(RowId = 2, ColSpan = 3)]
         public string Number { get; set; }
+        
+        [Display(Name = "City"), 
+        // Show Placeholder
+        VxFormElementLayout(Placeholder = "The city you live"),
+        VxLookup(typeof(CityResolver))]
+        public string City { get; set; }
 
-        [Display(Name = "Country"),
-         // Show Placeholder
-         VxFormElementLayout(Placeholder = "The country you live"),
-            VxLookup(typeof(CountryResolver))]
+        [Display(Name = "Country"), 
+        // Show Placeholder
+        VxFormElementLayout(Placeholder = "The country you live"),
+        VxLookup(typeof(CountryResolver))]
         public string Country { get; set; }
 
         [Display(Name = "State")]

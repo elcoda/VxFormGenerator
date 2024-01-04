@@ -25,6 +25,7 @@ namespace VxFormGenerator.Repository.Plain
         private void Setup(System.Reflection.Assembly[] assemblies)
         {
 
+            //Association between data-type and component-type that will render it
             var registrationDict = new Dictionary<Type, Type>()
                   {
                         {typeof(string), typeof(InputText) },
